@@ -1,0 +1,86 @@
+---
+title: "Algerian R Users App"
+author: "Mohamed El Fodil Ihaddaden"
+date: "11/04/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+
+```
+
+```{r}
+library(ralger)
+
+data <-
+  table_scrap("https://worldpopulationreview.com/countries/most-visited-countries/")
+
+```
+
+
+```{r}
+
+data <- janitor::clean_names(data)
+
+```
+
+
+```{r}
+
+data$international_tourist_arrivals <-
+  parse_number(data$international_tourist_arrivals, na = "..")
+
+
+```
+
+
+```{r }
+
+library("rnaturalearth")
+library("rnaturalearthdata")
+
+world <- ne_countries(scale = "large", returnclass = "sf")
+
+
+# The USA problem
+world$sovereignt  <-
+  world$sovereignt %>%  str_replace_all("United States of America", "United States")
+
+  
+
+
+```
+
+
+```{r}
+
+final_data <-
+  world %>% left_join(data, by = c("sovereignt" = "country"))
+
+
+```
+
+```{r}
+
+
+ggplot(final_data) +
+  geom_sf(aes(fill = international_tourist_arrivals)) +
+  scale_fill_gradientn(colours = c("darkred", "orange", "yellow",
+                                   "lightblue", "steelblue", "blue")) +
+  labs(fill = "Tourist Arrival",
+       title = "Répartition du nombre de touristes par pays en 2019",
+       caption = "Les pays ont gris représente des valeurs manquantes") +
+  theme_dark()
+
+
+```
+
+
+
+
+
+
+
+
