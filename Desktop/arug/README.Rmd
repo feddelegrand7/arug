@@ -90,7 +90,7 @@ ggplot(final_data) +
                                    "lightblue", "steelblue", "blue")) +
   labs(fill = "Tourist Arrival",
        title = "Répartition du nombre de touristes par pays en 2019",
-       caption = "Les pays ont gris représente des valeurs manquantes") +
+       caption = "Les pays en gris représentent des valeurs manquantes") +
   theme_dark()
 
 
