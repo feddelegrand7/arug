@@ -1,0 +1,105 @@
+---
+output: github_document
+---
+
+
+# Algerian R Users Group live demo
+
+In this demo, I tried to map the distribution of international tourists arrival per country in 2019. The video (in Algerian dialect) can be found [here](https://www.facebook.com/FaUx.DiLz.IHa/videos/3302395576438655/?comment_id=3060255194025475&notif_id=1586632143270686&notif_t=group_comment)
+
+
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+## Loading the tidyverse package
+```{r}
+
+library(tidyverse)
+
+```
+
+## Extracting the data
+
+```{r}
+library(ralger)
+
+data <-
+  table_scrap("https://worldpopulationreview.com/countries/most-visited-countries/")
+
+```
+
+## Cleaning the columns' names
+```{r}
+
+data <- janitor::clean_names(data)
+
+```
+
+
+## Converting the character column to numeric
+```{r}
+
+data$international_tourist_arrivals <-
+  parse_number(data$international_tourist_arrivals, na = "..")
+
+
+```
+
+## Getting the sf data
+
+```{r }
+
+library("rnaturalearth")
+library("rnaturalearthdata")
+
+world <- ne_countries(scale = "large", returnclass = "sf")
+
+
+# The USA problem
+world$sovereignt  <-
+  world$sovereignt %>%  str_replace_all("United States of America", "United States")
+
+  
+
+
+```
+
+## Joining the datasets
+
+```{r}
+
+final_data <-
+  world %>% left_join(data, by = c("sovereignt" = "country"))
+
+
+```
+
+## Plotting the distribution of internation tourists around the world
+
+```{r}
+
+
+ggplot(final_data) +
+  geom_sf(aes(fill = international_tourist_arrivals)) +
+  scale_fill_gradientn(colours = c("darkred", "orange", "yellow",
+                                   "lightblue", "steelblue", "blue")) +
+  labs(fill = "Tourist Arrival",
+       title = "Répartition du nombre de touristes par pays en 2019",
+       caption = "Les pays ont gris représente des valeurs manquantes") +
+  theme_dark()
+
+
+```
+
+
+
+
+
+
+
+
